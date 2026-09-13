@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-registro Evento Melgar</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('fondo.jpg') no-repeat center center fixed; 
+            background-size: cover; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px 15px; 
+            color: #fff; 
+        }
+        
+        .card-glass { 
+            background: rgba(18, 7, 10, 0.92); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 51, 51, 0.35); 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 500px; 
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); 
+            scroll-behavior: smooth;
+        }
+        
+        .card-glass::-webkit-scrollbar { width: 6px; }
+        .card-glass::-webkit-scrollbar-thumb { background: rgba(255, 51, 51, 0.5); border-radius: 4px; }
+
+        .banner-container { 
+            position: relative; 
+            width: 100%; 
+            cursor: pointer; 
+            border-bottom: 1px solid rgba(255, 51, 51, 0.3); 
+        }
+        .banner-img { 
+            width: 100%; 
+            display: block; 
+            border-top-left-radius: 19px; 
+            border-top-right-radius: 19px; 
+            object-fit: cover; 
+        }
+
+        /* Posicionamiento centrado justo debajo del texto principal del banner */
+        .banner-overlay { 
+            position: absolute; 
+            top: 65%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: linear-gradient(135deg, #ff3333, #990000); 
+            color: #fff; 
+            font-size: 11px; 
+            font-weight: bold; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            text-transform: uppercase; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7); 
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .banner-container:hover .banner-overlay {
+            transform: translate(-50%, -52%);
+            box-shadow: 0 6px 20px rgba(255, 51, 51, 0.6);
+        }
+
+        .card-body { padding: 25px; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 11px; text-transform: uppercase; color: #ccc; margin-bottom: 6px; font-weight: 600; }
+        .form-group input, .form-group select { 
+            width: 100%; padding: 11px 13px; background: rgba(255, 255, 255, 0.07); 
+            border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 8px; color: #fff; font-size: 13px; outline: none; 
+        }
+        .form-group select option { background: #12070a; color: #fff; }
+        .phone-flex { display: flex; gap: 8px; }
+
+        .check-intl { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: #ccc; cursor: pointer; }
+        .check-intl input { accent-color: #ff3333; }
+
+        .radio-group { display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #ddd; margin-top: 5px; }
+        .radio-group label { display: flex; align-items: center; cursor: pointer; }
+        .radio-group input { margin-right: 10px; accent-color: #ff3333; width: 16px; height: 16px; }
+
+        .btn-container { display: flex; gap: 10px; margin-top: 25px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; text-align: center; }
+        .btn-preregistro { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-preregistro:hover { background: rgba(255, 255, 255, 0.2); }
+        .btn-registro { background: linear-gradient(135deg, #990000, #ff3333); color: #fff; box-shadow: 0 4px 15px rgba(255, 51, 51, 0.4); }
+        .btn-registro:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 51, 51, 0.6); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="card-glass" id="cardGlass">
+    <div class="banner-container" onclick="scrollAlFormulario()">
+        <img src="portada.png" alt="Portada Evento" class="banner-img">
+        <div class="banner-overlay">HAZ CLIC PARA VOTAR Y REGISTRARTE</div>
+    </div>
+
+    <div class="card-body">
+        <form id="preForm" onsubmit="return false;">
+            <div class="form-group" id="primerCampo">
+                <label>Nombre Completo</label>
+                <input type="text" id="nombre" placeholder="Nombre" required>
+            </div>
+
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="email" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <div class="form-group">
+                <label>Teléfono / WhatsApp</label>
+                <div class="phone-flex">
+                    <select id="prefijo_pais" style="display: none; width: 45%;">
+                        <option value="+57">🇨🇴 Colombia (+57)</option>
+                        <option value="+1">🇺🇸 EE.UU. / Canadá (+1)</option>
+                        <option value="+34">🇪🇸 España (+34)</option>
+                        <option value="+52">🇲🇽 México (+52)</option>
+                        <option value="+54">🇦🇷 Argentina (+54)</option>
+                        <option value="+56">🇨🇱 Chile (+56)</option>
+                        <option value="+51">🇵🇪 Perú (+51)</option>
+                        <option value="+593">🇪🇨 Ecuador (+593)</option>
+                        <option value="+58">🇻🇪 Venezuela (+58)</option>
+                        <option value="+55">🇧🇷 Brasil (+55)</option>
+                        <option value="+506">🇨🇷 Costa Rica (+506)</option>
+                        <option value="+507">🇵🇦 Panamá (+507)</option>
+                    </select>
+                    <input type="tel" id="telefono" placeholder="3000000000" maxlength="10" required>
+                </div>
+                <label class="check-intl">
+                    <input type="checkbox" id="check_intl" onchange="toggleIntl()">
+                    Número internacional (fuera de Colombia)
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label style="color: #ff5555; font-weight: bold;">Selecciona tu Fecha Preferida</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="fecha_preferida" value="10, 11 y 12 de Octubre" checked> 10, 11 y 12 de Octubre</label>
+                    <label><input type="radio" name="fecha_preferida" value="31 de Octubre - 01 y 02 de Noviembre"> 31 de Octubre - 01 y 02 de Noviembre</label>
+                    <label><input type="radio" name="fecha_preferida" value="14, 15 y 16 de Noviembre"> 14, 15 y 16 de Noviembre</label>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button type="button" id="btnPre" class="btn btn-preregistro" onclick="procesarRegistro(false)">Solo Pre-registro</button>
+                <button type="button" id="btnFull" class="btn btn-registro" onclick="procesarRegistro(true)">Registro Completo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://ovdogepzrbvgnglsaame.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZG9nZXB6cmJ2Z25nbHNhYW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyOTk3MjAsImV4cCI6MjEwNDg3NTcyMH0.hB5IiZe1ZWQrDT6HGRRub_y4ftC0tL4SIC_xNBKCLFw'; // Reemplaza con tu anon key de Settings > API
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Scroll suave hacia los campos del formulario
+    function scrollAlFormulario() {
+        const primerCampo = document.getElementById('primerCampo');
+        primerCampo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('nombre').focus();
+    }
+
+    function toggleIntl() {
+        const esIntl = document.getElementById('check_intl').checked;
+        const telInput = document.getElementById('telefono');
+        const prefijoSelect = document.getElementById('prefijo_pais');
+
+        if (esIntl) {
+            prefijoSelect.style.display = 'block';
+            telInput.removeAttribute('maxlength');
+            telInput.placeholder = "3001234567";
+        } else {
+            prefijoSelect.style.display = 'none';
+            telInput.setAttribute('maxlength', '10');
+            telInput.placeholder = "3000000000";
+        }
+    }
+
+    function esCorreoValido(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    }
+
+    async function procesarRegistro(irACompleto) {
+        const btnPre = document.getElementById('btnPre');
+        const btnFull = document.getElementById('btnFull');
+        
+        const nombre = document.getElementById('nombre').value.trim();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        let telRaw = document.getElementById('telefono').value.trim();
+        const esIntl = document.getElementById('check_intl').checked;
+        const prefijo = document.getElementById('prefijo_pais').value;
+        const fecha = document.querySelector('input[name="fecha_preferida"]:checked').value;
+
+        if (!nombre) {
+            alert('Por favor ingresa tu nombre completo.');
+            return;
+        }
+
+        if (!email) {
+            alert('Por favor ingresa tu correo electrónico.');
+            return;
+        }
+
+        if (!esCorreoValido(email)) {
+            alert('Por favor ingresa un correo electrónico válido (Ej: usuario@dominio.com).');
+            return;
+        }
+
+        if (!telRaw) {
+            alert('Por favor ingresa tu número de teléfono / WhatsApp.');
+            return;
+        }
+
+        let telefonoCompleto = '';
+        if (esIntl) {
+            telefonoCompleto = prefijo + telRaw;
+        } else {
+            if (!/^\d{10}$/.test(telRaw)) {
+                alert('El teléfono colombiano debe contener exactamente 10 dígitos.');
+                return;
+            }
+            telefonoCompleto = '+57' + telRaw;
+        }
+
+        btnPre.disabled = true;
+        btnFull.disabled = true;
+
+        try {
+            let targetId = null;
+
+            const { data: existente, error: searchError } = await _supabase
+                .from('asistentes')
+                .select('id, estado_registro, nombre_completo')
+                .eq('email', email)
+                .maybeSingle();
+
+            if (searchError) throw searchError;
+
+            if (existente) {
+                targetId = existente.id;
+                await _supabase
+                    .from('asistentes')
+                    .update({ 
+                        fecha_preferida: fecha,
+                        telefono: telefonoCompleto
+                    })
+                    .eq('id', targetId);
+            } else {
+                const { data: nuevo, error: insertError } = await _supabase
+                    .from('asistentes')
+                    .insert([{
+                        nombre_completo: nombre,
+                        email: email,
+                        telefono: telefonoCompleto,
+                        fecha_preferida: fecha,
+                        estado_registro: 'pendiente'
+                    }])
+                    .select()
+                    .single();
+
+                if (insertError) throw insertError;
+                targetId = nuevo.id;
+            }
+
+            if (irACompleto) {
+                window.location.href = `registro-completo.html?id=${targetId}`;
+            } else {
+                alert(`¡Gracias ${nombre}! Tu fecha preferida ha sido registrada correctamente.`);
+                document.getElementById('preForm').reset();
+            }
+
+        } catch (err) {
+            alert('Error al procesar el registro: ' + err.message);
+        } finally {
+            btnPre.disabled = false;
+            btnFull.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

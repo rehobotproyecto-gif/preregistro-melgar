@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Oficial de Asistencia</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('fondo.jpg') no-repeat center center fixed; 
+            background-size: cover; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px 15px; 
+            color: #fff; 
+        }
+
+        .form-card { 
+            background: rgba(18, 7, 10, 0.92); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 51, 51, 0.35); 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 650px; 
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 35px; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); 
+        }
+
+        /* Scrollbar personalizado */
+        .form-card::-webkit-scrollbar { width: 6px; }
+        .form-card::-webkit-scrollbar-thumb { background: rgba(255, 51, 51, 0.5); border-radius: 4px; }
+
+        h2 { text-align: center; color: #ff3333; font-size: 20px; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px; }
+        .user-greeting { text-align: center; font-size: 13px; color: #aaa; margin-bottom: 20px; }
+        .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #ff5555; border-bottom: 1px solid rgba(255, 51, 51, 0.3); padding-bottom: 6px; margin: 25px 0 15px 0; font-weight: 700; }
+        .req-star { color: #ff3333; font-weight: bold; margin-left: 2px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 500px) { .grid-2 { grid-template-columns: 1fr; } }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 11px; text-transform: uppercase; color: #ccc; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 13px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 8px; color: #fff; font-size: 13px; outline: none; }
+        .form-group select option { background: #12070a; color: #fff; }
+        .phone-flex { display: flex; gap: 8px; }
+
+        .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #ddd; margin-top: 5px; }
+        .radio-group label, .checkbox-group label { display: flex; align-items: center; cursor: pointer; }
+        .radio-group input, .checkbox-group input { margin-right: 10px; accent-color: #ff3333; width: 16px; height: 16px; }
+        
+        /* Casilla check internacional rediseñada */
+        .check-intl-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            user-select: none;
+        }
+        .check-intl-container input[type="checkbox"] {
+            accent-color: #ff3333;
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+        }
+        .check-intl-container span {
+            font-size: 12px;
+            color: #ddd;
+        }
+
+        .btn-submit { width: 100%; padding: 15px; margin-top: 30px; background: linear-gradient(135deg, #990000, #ff3333); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 51, 51, 0.4); }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 51, 51, 0.6); }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2>Formulario Oficial de Viaje</h2>
+    <div id="greeting" class="user-greeting">Cargando datos del asistente...</div>
+
+    <form id="fullForm" onsubmit="return false;">
+        <!-- 1. IDENTIFICACIÓN Y CONTACTO (OBLIGATORIO) -->
+        <div class="section-title">1. Identificación y Contacto</div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Tipo de Documento<span class="req-star">*</span></label>
+                <select id="tipo_doc" required>
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Número de Documento<span class="req-star">*</span></label>
+                <input type="text" id="numero_doc" placeholder="Ej: 1018223948" required>
+            </div>
+        </div>
+
+        <!-- 2. MODALIDAD Y ACOMODACIÓN -->
+        <div class="section-title">2. Modalidad y Acomodación</div>
+        <div class="form-group">
+            <label>Modalidad de Asistencia</label>
+            <div class="radio-group">
+                <label><input type="radio" name="modalidad_viaje" value="Solo/a" checked> Solo/a</label>
+                <label><input type="radio" name="modalidad_viaje" value="En pareja"> En pareja</label>
+                <label><input type="radio" name="modalidad_viaje" value="Con amigos / Grupo"> Con amigos / Grupo</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Preferencia de Alojamiento / Cama</label>
+            <div class="radio-group">
+                <label><input type="radio" name="alojamiento_cama" value="Cama sencilla / individual" checked> Cama sencilla / individual</label>
+                <label><input type="radio" name="alojamiento_cama" value="Compartir cama"> Compartir cama (con pareja o compañero)</label>
+            </div>
+        </div>
+
+        <!-- 3. LOGÍSTICA Y TRANSPORTE -->
+        <div class="section-title">3. Logística y Transporte</div>
+        <div class="form-group">
+            <label>Medio de Transporte</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="transporte_medio" value="Bus contratado" checked onchange="toggleOpcionesCarro()"> 
+                    Bus contratado (excursión)
+                </label>
+                <label>
+                    <input type="radio" name="transporte_medio" value="Carro particular" onchange="toggleOpcionesCarro()"> 
+                    Carro particular
+                </label>
+            </div>
+        </div>
+
+        <div id="opciones_carro_container" style="display: none; background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 15px;">
+            <div class="form-group">
+                <label>¿Tienes disponibilidad de cupos en tu carro?</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="carro_cupos_radio" value="No / Voy con cupo lleno" checked onchange="togglePuestosLibres()"> 
+                        No / Voy con cupo lleno
+                    </label>
+                    <label>
+                        <input type="radio" name="carro_cupos_radio" value="Si, tengo cupos disponibles" onchange="togglePuestosLibres()"> 
+                        Sí, tengo cupos disponibles
+                    </label>
+                </div>
+            </div>
+
+            <div id="puestos_container" style="display: none; margin-top: 12px;">
+                <div class="form-group">
+                    <label>¿Cuántos puestos libres tienes?</label>
+                    <input type="number" id="carro_puestos_num" min="1" value="1" placeholder="Ej: 2">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 12px; margin-bottom: 0;">
+                <label>Horario estimado de llegada</label>
+                <input type="time" id="horario_llegada">
+            </div>
+        </div>
+
+        <!-- 4. ALIMENTACIÓN Y CONVIVENCIA -->
+        <div class="section-title">4. Alimentación y Convivencia</div>
+        <div class="form-group">
+            <label>Restricciones Alimentarias (Selección múltiple)</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="restricciones" value="Ninguna" checked> Ninguna</label>
+                <label><input type="checkbox" name="restricciones" value="Vegetariano/a"> Vegetariano/a</label>
+                <label><input type="checkbox" name="restricciones" value="Vegano/a"> Vegano/a</label>
+                <label><input type="checkbox" name="restricciones" value="Intolerancia a la lactosa"> Intolerancia a la lactosa</label>
+                <label><input type="checkbox" name="restricciones" value="Celíaco/a"> Celíaco/a (Sin gluten)</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Ambiente de Convivencia Preferido</label>
+            <div class="radio-group">
+                <label><input type="radio" name="ambiente_preferencia" value="Tranquilo y descanso" checked> Prefiero ambiente tranquilo y descanso moderado</label>
+                <label><input type="radio" name="ambiente_preferencia" value="Rumba nocturna"> Me gusta la rumba nocturna y el ambiente festivo</label>
+            </div>
+        </div>
+
+        <!-- 5. INFORMACIÓN MÉDICA Y SALUD (OBLIGATORIO: TIPO SANGRE Y EPS) -->
+        <div class="section-title">5. Información Médica y Salud</div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Tipo de Sangre y RH<span class="req-star">*</span></label>
+                <input type="text" id="tipo_sangre" placeholder="Ej: O+" required>
+            </div>
+            <div class="form-group">
+                <label>EPS o Prepaga<span class="req-star">*</span></label>
+                <input type="text" id="eps" placeholder="Ej: Sura, Sanitas" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Alergias Conocidas</label>
+            <input type="text" id="alergias" placeholder="Medicamentos, alimentos, picaduras (o 'Ninguna')">
+        </div>
+        <div class="form-group">
+            <label>Condiciones Médicas Preexistentes / Medicamentos</label>
+            <textarea id="condiciones_medicas" rows="2" placeholder="Detalla condiciones o medicamentos de uso regular"></textarea>
+        </div>
+
+        <!-- 6. CONTACTO DE EMERGENCIA (OBLIGATORIO: NOMBRE Y TELÉFONO) -->
+        <div class="section-title">6. Contacto en Caso de Emergencia</div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Nombre del Contacto<span class="req-star">*</span></label>
+                <input type="text" id="emergencia_nombre" placeholder="Nombre completo" required>
+            </div>
+            <div class="form-group">
+                <label>Parentesco / Relación</label>
+                <input type="text" id="emergencia_parentesco" placeholder="Ej: Mamá, Pareja">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Teléfono del Contacto Directo<span class="req-star">*</span></label>
+            <div class="phone-flex">
+                <select id="emergencia_prefijo" style="display: none; width: 45%;">
+                    <option value="+57">🇨🇴 Colombia (+57)</option>
+                    <option value="+1">🇺🇸 EE.UU. / Canada (+1)</option>
+                    <option value="+34">🇪🇸 España (+34)</option>
+                    <option value="+52">🇲🇽 México (+52)</option>
+                    <option value="+54">🇦🇷 Argentina (+54)</option>
+                    <option value="+56">🇨🇱 Chile (+56)</option>
+                    <option value="+51">🇵🇪 Perú (+51)</option>
+                    <option value="+593">🇪🇨 Ecuador (+593)</option>
+                    <option value="+58">🇻🇪 Venezuela (+58)</option>
+                    <option value="+55">🇧🇷 Brasil (+55)</option>
+                    <option value="+506">🇨🇷 Costa Rica (+506)</option>
+                    <option value="+507">🇵🇦 Panamá (+507)</option>
+                </select>
+                <input type="tel" id="emergencia_telefono" placeholder="3000000000" maxlength="10" required>
+            </div>
+            
+            <label class="check-intl-container" for="emergencia_intl">
+                <input type="checkbox" id="emergencia_intl" onchange="toggleEmergenciaIntl()">
+                <span>¿Es un número internacional? (Fuera de Colombia)</span>
+            </label>
+        </div>
+
+        <!-- 7. MODALIDAD DE PAGO -->
+        <div class="section-title">7. Modalidad de Pago</div>
+        <div class="form-group">
+            <label>Forma de Pago</label>
+            <div class="radio-group">
+                <label><input type="radio" name="pago_modalidad" value="Contado" checked> Pago de contado (Totalidad)</label>
+                <label><input type="radio" name="pago_modalidad" value="Abono"> Abono para apartar cupo</label>
+                <label><input type="radio" name="pago_modalidad" value="Cuotas"> Pago por cuotas</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Adjuntar Imagen del Comprobante de Pago (Galería)</label>
+            <input type="file" id="pago_imagen" accept="image/*">
+        </div>
+
+        <button type="button" class="btn-submit" onclick="guardarRegistroCompleto()">Finalizar y Confirmar Asistencia</button>
+    </form>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://ovdogepzrbvgnglsaame.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZG9nZXB6cmJ2Z25nbHNhYW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyOTk3MjAsImV4cCI6MjEwNDg3NTcyMH0.hB5IiZe1ZWQrDT6HGRRub_y4ftC0tL4SIC_xNBKCLFw';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('id');
+
+    async function precargarDatos() {
+        if (!userId) {
+            alert('Enlace no válido. Serás redirigido al inicio.');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const { data, error } = await _supabase.from('asistentes').select('nombre_completo, email').eq('id', userId).single();
+        if (error || !data) {
+            alert('No se encontró la información del pre-registro.');
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('greeting').innerText = `Completando el registro para: ${data.nombre_completo} (${data.email})`;
+        }
+    }
+    precargarDatos();
+
+    function toggleOpcionesCarro() {
+        const medio = document.querySelector('input[name="transporte_medio"]:checked').value;
+        const container = document.getElementById('opciones_carro_container');
+        container.style.display = (medio === 'Carro particular') ? 'block' : 'none';
+    }
+
+    function togglePuestosLibres() {
+        const tieneCupos = document.querySelector('input[name="carro_cupos_radio"]:checked').value;
+        document.getElementById('puestos_container').style.display = (tieneCupos === 'Si, tengo cupos disponibles') ? 'block' : 'none';
+    }
+
+    function toggleEmergenciaIntl() {
+        const esIntl = document.getElementById('emergencia_intl').checked;
+        const telInput = document.getElementById('emergencia_telefono');
+        const prefijoSelect = document.getElementById('emergencia_prefijo');
+
+        if (esIntl) {
+            prefijoSelect.style.display = 'block';
+            telInput.removeAttribute('maxlength');
+            telInput.placeholder = "3001234567";
+        } else {
+            prefijoSelect.style.display = 'none';
+            telInput.setAttribute('maxlength', '10');
+            telInput.placeholder = "3000000000";
+        }
+    }
+
+    async function guardarRegistroCompleto() {
+        // --- 1. VALIDACIÓN DE CAMPOS OBLIGATORIOS ---
+        const tipoDoc = document.getElementById('tipo_doc').value.trim();
+        const numDoc = document.getElementById('numero_doc').value.trim();
+        const tipoSangre = document.getElementById('tipo_sangre').value.trim();
+        const eps = document.getElementById('eps').value.trim();
+        const emergenciaNombre = document.getElementById('emergencia_nombre').value.trim();
+        const emergenciaTelRaw = document.getElementById('emergencia_telefono').value.trim();
+
+        if (!tipoDoc || !numDoc) {
+            alert('Por favor completa la sección 1 (Tipo y Número de documento).');
+            document.getElementById('numero_doc').focus();
+            return;
+        }
+
+        if (!tipoSangre || !eps) {
+            alert('Por favor completa los datos médicos obligatorios (Tipo de Sangre y EPS).');
+            document.getElementById('tipo_sangre').focus();
+            return;
+        }
+
+        if (!emergenciaNombre) {
+            alert('Por favor ingresa el nombre del contacto de emergencia.');
+            document.getElementById('emergencia_nombre').focus();
+            return;
+        }
+
+        if (!emergenciaTelRaw) {
+            alert('Por favor ingresa el teléfono del contacto de emergencia.');
+            document.getElementById('emergencia_telefono').focus();
+            return;
+        }
+
+        // Validación de formato de teléfono
+        const esEmIntl = document.getElementById('emergencia_intl').checked;
+        const prefijoEm = document.getElementById('emergencia_prefijo').value;
+        let emergenciaTelFinal = '';
+
+        if (esEmIntl) {
+            emergenciaTelFinal = prefijoEm + ' ' + emergenciaTelRaw;
+        } else {
+            if (!/^\d{10}$/.test(emergenciaTelRaw)) {
+                alert('El teléfono colombiano debe tener exactamente 10 dígitos numéricos.');
+                document.getElementById('emergencia_telefono').focus();
+                return;
+            }
+            emergenciaTelFinal = '+57 ' + emergenciaTelRaw;
+        }
+
+        // Restricciones alimentarias
+        const restricciones = Array.from(document.querySelectorAll('input[name="restricciones"]:checked'))
+            .map(cb => cb.value)
+            .join(', ');
+
+        // Carga del comprobante
+        let comprobanteUrl = '';
+        const fileInput = document.getElementById('pago_imagen');
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileExt = file.name.split('.').pop();
+            const filePath = `${userId}_${Date.now()}.${fileExt}`;
+
+            const { data: uploadData, error: uploadError } = await _supabase.storage
+                .from('comprobantes')
+                .upload(filePath, file);
+
+            if (uploadError) {
+                alert('Error al subir la imagen del comprobante: ' + uploadError.message);
+                return;
+            }
+
+            const { data: publicUrlData } = _supabase.storage.from('comprobantes').getPublicUrl(filePath);
+            comprobanteUrl = publicUrlData.publicUrl;
+        }
+
+        const medioTransporte = document.querySelector('input[name="transporte_medio"]:checked').value;
+        const tieneCuposOpcion = medioTransporte === 'Carro particular' 
+            ? document.querySelector('input[name="carro_cupos_radio"]:checked').value 
+            : 'No aplica';
+
+        const payload = {
+            tipo_documento: tipoDoc,
+            numero_documento: numDoc,
+            modalidad_viaje: document.querySelector('input[name="modalidad_viaje"]:checked').value,
+            alojamiento_cama: document.querySelector('input[name="alojamiento_cama"]:checked').value,
+            transporte_medio: medioTransporte,
+            carro_cupos_opcion: tieneCuposOpcion,
+            carro_puestos_libres: (medioTransporte === 'Carro particular' && tieneCuposOpcion.startsWith('Si')) 
+                ? (parseInt(document.getElementById('carro_puestos_num').value) || 0) 
+                : 0,
+            horario_llegada: medioTransporte === 'Carro particular' ? document.getElementById('horario_llegada').value : '',
+            restriccion_alimentaria: restricciones || 'Ninguna',
+            ambiente_convivencia: document.querySelector('input[name="ambiente_preferencia"]:checked').value,
+            tipo_sangre: tipoSangre,
+            eps: eps,
+            alergias: document.getElementById('alergias').value.trim() || 'Ninguna',
+            condiciones_medicas: document.getElementById('condiciones_medicas').value.trim() || 'Ninguna',
+            emergencia_nombre: emergenciaNombre,
+            emergencia_parentesco: document.getElementById('emergencia_parentesco').value.trim() || 'No especificado',
+            emergencia_telefono: emergenciaTelFinal,
+            pago_modalidad: document.querySelector('input[name="pago_modalidad"]:checked').value,
+            pago_comprobante_url: comprobanteUrl,
+            estado_registro: 'completado'
+        };
+
+        try {
+            const { error } = await _supabase.from('asistentes').update(payload).eq('id', userId);
+            if (error) throw error;
+            alert('¡Registro completado exitosamente!');
+            window.location.href = 'index.html';
+        } catch (err) {
+            alert('Error al guardar la información: ' + err.message);
+        }
+    }
+</script>
+</body>
+</html>
