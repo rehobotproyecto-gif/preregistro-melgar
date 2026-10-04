@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pre-registro Evento Melgar</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Librería gratuita para generar el QR sin depender de servicios externos -->
+    <!-- Librería para generación dinámica del QR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -89,33 +89,126 @@
 
         .btn-container { display: flex; gap: 10px; margin-top: 25px; }
         .btn { flex: 1; padding: 14px; border: none; border-radius: 8px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; text-align: center; }
-        .btn-registro { background: linear-gradient(135deg, #990000, #ff3333); color: #fff; box-shadow: 0 4px 15px rgba(255, 51, 51, 0.4); width: 100%; }
+        .btn-registro { background: linear-gradient(135deg, #990000, #ff3333); color: #fff; box-shadow: 0 4px 15px rgba(255, 51, 51, 0.4); }
         .btn-registro:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 51, 51, 0.6); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Estilo para la sección del Código QR incrustado */
+        /* SECCIÓN CÓDIGO QR */
         .qr-section {
-            margin-top: 30px;
-            text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 51, 51, 0.2);
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
         .qr-section p {
+            font-size: 12px;
+            color: #ccc;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        #codigoQR {
+            padding: 10px;
+            background: #fff;
+            border-radius: 8px;
+            border: 2px solid #ff3333;
+            display: inline-block;
+        }
+
+        /* SECCIÓN WHATSAPP Y ORGANIZADORES */
+        .footer-info-block {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 51, 51, 0.35);
+        }
+
+        .wa-links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .btn-wa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn-wa-community {
+            background: #25D366;
+            color: #000;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-wa-info {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(37, 211, 102, 0.5);
+            color: #25D366;
+        }
+
+        .btn-wa:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .organizers-footer {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .org-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .org-box span {
             font-size: 11px;
             text-transform: uppercase;
+            letter-spacing: 1px;
             color: #aaa;
-            margin-bottom: 12px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
+            font-weight: 700;
         }
-        #codigoQR {
-            display: inline-block;
-            background: #ffffff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+
+        .img-organiza {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+        }
+
+        .img-apoya {
+            max-width: 130px;
+            height: auto;
+            max-height: 50px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 6px rgba(255, 51, 51, 0.3));
         }
     </style>
 </head>
@@ -165,35 +258,62 @@
             </div>
 
             <div class="btn-container">
-                <button type="button" id="btnFull" class="btn btn-registro" onclick="procesarRegistro()">Continuar al Registro Completo</button>
+                <button type="button" id="btnFull" class="btn btn-registro" onclick="procesarRegistro()">CONTINUAR AL REGISTRO COMPLETO</button>
             </div>
         </form>
 
-        <!-- Bloque del código QR generado dinámicamente y gratis -->
+        <!-- SECCIÓN CÓDIGO QR -->
         <div class="qr-section">
-            <p>📱 Escanea para abrir el registro oficial</p>
+            <p>Escanea para compartir o registrarte</p>
             <div id="codigoQR"></div>
+        </div>
+
+        <!-- SECCIÓN COMUNIDAD Y ORGANIZADORES -->
+        <div class="footer-info-block">
+            <div class="wa-links-container">
+                <a href="https://chat.whatsapp.com/BrbbSJJRPMs3wtto1XHbVx" target="_blank" class="btn-wa btn-wa-community">
+                    💬 Únete a la Comunidad de WhatsApp
+                </a>
+                <a href="https://wa.me/message/O2ZQ6CRDLKPYM1?src=qr" target="_blank" class="btn-wa btn-wa-info">
+                    📞 Info Directa: 3028223498 - 3135485035
+                </a>
+            </div>
+
+            <div class="organizers-footer">
+                <div class="org-box">
+                    <span>Organiza</span>
+                    <img src="organiza.jpeg" alt="Organiza" class="img-organiza">
+                </div>
+                <div class="org-box">
+                    <span>Apoya</span>
+                    <img src="apoya.jpeg" alt="Groseros Melgar" class="img-apoya">
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     const SUPABASE_URL = 'https://ovdogepzrbvgnglsaame.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZG9nZXB6cmJ2Z25nbHNhYW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyOTk3MjAsImV4cCI6MjEwNDg3NTcyMH0.hB5IiZe1ZWQrDT6HGRRub_y4ftC0tL4SIC_xNBKCLFw'; 
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZG9nZXB6cmJ2Z25nbHNhYW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyOTk3MjAsImV4cCI6MjEwNDg3NTcyMH0.hB5IiZe1ZWQrDT6HGRRub_y4ftC0tL4SIC_xNBKCLFw';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Generar automáticamente el QR apuntando a Vercel de forma permanente
+    // Generar automáticamente el QR apuntando a Vercel
     document.addEventListener("DOMContentLoaded", function() {
         const urlOficial = "https://preregistro-melgar.vercel.app/";
-        document.getElementById("codigoQR").innerHTML = "";
-        new QRCode(document.getElementById("codigoQR"), {
-            text: urlOficial,
-            width: 130,
-            height: 130,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
+        const qrContainer = document.getElementById("codigoQR");
+
+        if (qrContainer) {
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+                text: urlOficial,
+                width: 130,
+                height: 130,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
     });
 
     function scrollAlFormulario() {
@@ -254,13 +374,13 @@
 
         let telefonoCompleto = '';
         if (esIntl) {
-            telefonoCompleto = prefijo + telRaw;
+            telefonoCompleto = prefijo + ' ' + telRaw;
         } else {
             if (!/^\d{10}$/.test(telRaw)) {
                 alert('El teléfono colombiano debe contener exactamente 10 dígitos.');
                 return;
             }
-            telefonoCompleto = '+57' + telRaw;
+            telefonoCompleto = '+57 ' + telRaw;
         }
 
         btnFull.disabled = true;
@@ -300,11 +420,11 @@
                 targetId = nuevo.id;
             }
 
-            // Redirigir de inmediato al formulario de registro completo
             window.location.href = `registro-completo.html?id=${targetId}`;
 
         } catch (err) {
             alert('Error al procesar el registro: ' + err.message);
+        } finally {
             btnFull.disabled = false;
         }
     }
