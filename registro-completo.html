@@ -31,7 +31,6 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); 
         }
 
-        /* Scrollbar personalizado */
         .form-card::-webkit-scrollbar { width: 6px; }
         .form-card::-webkit-scrollbar-thumb { background: rgba(255, 51, 51, 0.5); border-radius: 4px; }
 
@@ -47,13 +46,24 @@
         .form-group label { display: block; font-size: 11px; text-transform: uppercase; color: #ccc; margin-bottom: 6px; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 13px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 8px; color: #fff; font-size: 13px; outline: none; }
         .form-group select option { background: #12070a; color: #fff; }
+        .form-group input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         .phone-flex { display: flex; gap: 8px; }
 
-        .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #ddd; margin-top: 5px; }
-        .radio-group label, .checkbox-group label { display: flex; align-items: center; cursor: pointer; }
-        .radio-group input, .checkbox-group input { margin-right: 10px; accent-color: #ff3333; width: 16px; height: 16px; }
+        .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 12px; font-size: 13px; color: #ddd; margin-top: 5px; }
+        .radio-group label, .checkbox-group label { display: flex; align-items: flex-start; cursor: pointer; line-height: 1.4; }
+        .radio-group input, .checkbox-group input { margin-right: 10px; margin-top: 3px; accent-color: #ff3333; width: 16px; height: 16px; flex-shrink: 0; }
         
-        /* Casilla check internacional rediseñada */
+        .price-badge {
+            display: inline-block;
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid rgba(255, 51, 51, 0.3);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 12px;
+            color: #ffaaaa;
+            margin-left: 4px;
+        }
+
         .check-intl-container {
             display: flex;
             align-items: center;
@@ -79,6 +89,95 @@
 
         .btn-submit { width: 100%; padding: 15px; margin-top: 30px; background: linear-gradient(135deg, #990000, #ff3333); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 51, 51, 0.4); }
         .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 51, 51, 0.6); }
+
+        /* ESTILOS DE LA SECCIÓN DE COMUNIDAD Y CRÉDITOS */
+        .footer-info-block {
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 51, 51, 0.35);
+        }
+
+        .wa-links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .btn-wa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn-wa-community {
+            background: #25D366;
+            color: #000;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-wa-info {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(37, 211, 102, 0.5);
+            color: #25D366;
+        }
+
+        .btn-wa:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .organizers-footer {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .org-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .org-box span {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaa;
+            font-weight: 700;
+        }
+
+        .img-organiza {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+        }
+
+        .img-apoya {
+            max-width: 130px;
+            height: auto;
+            max-height: 50px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 6px rgba(255, 51, 51, 0.3));
+        }
     </style>
 </head>
 <body>
@@ -103,6 +202,29 @@
                 <label>Número de Documento<span class="req-star">*</span></label>
                 <input type="text" id="numero_doc" placeholder="Ej: 1018223948" required>
             </div>
+        </div>
+
+        <!-- FECHA DE NACIMIENTO Y EDAD -->
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Fecha de Nacimiento<span class="req-star">*</span></label>
+                <input type="date" id="fecha_nacimiento" onchange="calcularEdad()" required>
+            </div>
+            <div class="form-group">
+                <label>Edad</label>
+                <input type="text" id="edad_calculada" placeholder="Automático" readonly style="background: rgba(255,255,255,0.03); color: #ff8888; font-weight: bold;">
+            </div>
+        </div>
+
+        <!-- REDES SOCIALES / FOTO -->
+        <div class="section-title">Para conocerte un poco más</div>
+        <div class="form-group">
+            <label>Redes Sociales (Instagram / TikTok / Facebook)</label>
+            <input type="text" id="redes_sociales" placeholder="@tu_usuario o enlace de tu perfil">
+        </div>
+        <div class="form-group">
+            <label>Cargar foto personal (Opcional)</label>
+            <input type="file" id="foto_personal" accept="image/*">
         </div>
 
         <!-- 2. MODALIDAD Y ACOMODACIÓN -->
@@ -170,15 +292,18 @@
         <!-- 4. ALIMENTACIÓN Y CONVIVENCIA -->
         <div class="section-title">4. Alimentación y Convivencia</div>
         <div class="form-group">
-            <label>Restricciones Alimentarias (Selección múltiple)</label>
-            <div class="checkbox-group">
-                <label><input type="checkbox" name="restricciones" value="Ninguna" checked> Ninguna</label>
-                <label><input type="checkbox" name="restricciones" value="Vegetariano/a"> Vegetariano/a</label>
-                <label><input type="checkbox" name="restricciones" value="Vegano/a"> Vegano/a</label>
-                <label><input type="checkbox" name="restricciones" value="Intolerancia a la lactosa"> Intolerancia a la lactosa</label>
-                <label><input type="checkbox" name="restricciones" value="Celíaco/a"> Celíaco/a (Sin gluten)</label>
+            <label>¿Tienes alguna restricción alimentaria?</label>
+            <div class="radio-group" style="flex-direction: row; gap: 20px;">
+                <label><input type="radio" name="tiene_restriccion" value="No" checked onchange="toggleRestriccionAlimentaria()"> No</label>
+                <label><input type="radio" name="tiene_restriccion" value="Si" onchange="toggleRestriccionAlimentaria()"> Sí</label>
             </div>
         </div>
+
+        <div id="restriccion_detalle_container" style="display: none;" class="form-group">
+            <label>¿Qué o cuáles?</label>
+            <textarea id="restriccion_detalle" rows="2" placeholder="Ej: Vegetariano, alérgico al maní, intolerante a la lactosa, celíaco..."></textarea>
+        </div>
+
         <div class="form-group">
             <label>Ambiente de Convivencia Preferido</label>
             <div class="radio-group">
@@ -187,7 +312,7 @@
             </div>
         </div>
 
-        <!-- 5. INFORMACIÓN MÉDICA Y SALUD (OBLIGATORIO: TIPO SANGRE Y EPS) -->
+        <!-- 5. INFORMACIÓN MÉDICA Y SALUD -->
         <div class="section-title">5. Información Médica y Salud</div>
         <div class="grid-2">
             <div class="form-group">
@@ -203,22 +328,31 @@
             <label>Alergias Conocidas</label>
             <input type="text" id="alergias" placeholder="Medicamentos, alimentos, picaduras (o 'Ninguna')">
         </div>
+
+        <!-- CONDICIÓN DE DISCAPACIDAD -->
+        <div class="form-group">
+            <label>¿Cuentas con alguna condición de discapacidad?</label>
+            <div class="radio-group" style="flex-direction: row; gap: 20px;">
+                <label><input type="radio" name="tiene_discapacidad" value="No" checked onchange="toggleDiscapacidad()"> No</label>
+                <label><input type="radio" name="tiene_discapacidad" value="Si" onchange="toggleDiscapacidad()"> Sí</label>
+            </div>
+        </div>
+
+        <div id="discapacidad_detalle_container" style="display: none;" class="form-group">
+            <label>¿Cuál o cuáles?</label>
+            <textarea id="discapacidad_detalle" rows="2" placeholder="Describe brevemente la condición o requerimiento de accesibilidad"></textarea>
+        </div>
+
         <div class="form-group">
             <label>Comentarios y sugerencias</label>
             <textarea id="condiciones_medicas" rows="2" placeholder="Agrega comentarios o sugerencias que debamos tener en cuenta contigo"></textarea>
         </div>
 
-        <!-- 6. CONTACTO DE EMERGENCIA (OBLIGATORIO: NOMBRE Y TELÉFONO) -->
+        <!-- 6. CONTACTO DE EMERGENCIA -->
         <div class="section-title">6. Contacto en Caso de Emergencia</div>
-        <div class="grid-2">
-            <div class="form-group">
-                <label>Nombre del Contacto<span class="req-star">*</span></label>
-                <input type="text" id="emergencia_nombre" placeholder="Nombre completo" required>
-            </div>
-            <div class="form-group">
-                <label>Parentesco / Relación</label>
-                <input type="text" id="emergencia_parentesco" placeholder="Ej: Mamá, Pareja">
-            </div>
+        <div class="form-group">
+            <label>Nombre del Contacto<span class="req-star">*</span></label>
+            <input type="text" id="emergencia_nombre" placeholder="Nombre completo del contacto" required>
         </div>
         <div class="form-group">
             <label>Teléfono del Contacto Directo<span class="req-star">*</span></label>
@@ -251,9 +385,28 @@
         <div class="form-group">
             <label>Forma de Pago</label>
             <div class="radio-group">
-                <label><input type="radio" name="pago_modalidad" value="Contado" checked> Pago de contado (Totalidad)</label>
-                <label><input type="radio" name="pago_modalidad" value="Abono"> Abono para apartar cupo</label>
-                <label><input type="radio" name="pago_modalidad" value="Cuotas"> Pago por cuotas</label>
+                <label>
+                    <input type="radio" name="pago_modalidad" value="Pago de contado (Totalidad)" checked> 
+                    <div>
+                        <strong>Pago de contado (Totalidad)</strong><br>
+                        <span>Con bus 🚌 <strong class="price-badge">$ 520.000</strong></span> | 
+                        <span>Sin bus 🚫🚌 <strong class="price-badge">$ 460.000</strong></span>
+                    </div>
+                </label>
+                <label>
+                    <input type="radio" name="pago_modalidad" value="Abono para apartar cupo (20% de descuento)"> 
+                    <div>
+                        <strong>Abono para apartar cupo (20% descuento)</strong><br>
+                        <span>Con bus 🚌 <strong class="price-badge">$ 104.000</strong></span> | 
+                        <span>Sin bus 🚫🚌 <strong class="price-badge">$ 92.000</strong></span>
+                    </div>
+                </label>
+                <label>
+                    <input type="radio" name="pago_modalidad" value="Pago por cuotas"> 
+                    <div>
+                        <strong>Pago por cuotas</strong>
+                    </div>
+                </label>
             </div>
         </div>
         <div class="form-group">
@@ -263,6 +416,29 @@
 
         <button type="button" class="btn-submit" onclick="guardarRegistroCompleto()">Finalizar y Confirmar Asistencia</button>
     </form>
+
+    <!-- BLOQUE INFORMATIVO DE WHATSAPP Y CRÉDITOS AL FINAL -->
+    <div class="footer-info-block">
+        <div class="wa-links-container">
+            <a href="https://chat.whatsapp.com/BrbbSJJRPMs3wtto1XHbVx" target="_blank" class="btn-wa btn-wa-community">
+                💬 Únete a la Comunidad de WhatsApp
+            </a>
+            <a href="https://wa.me/message/O2ZQ6CRDLKPYM1?src=qr" target="_blank" class="btn-wa btn-wa-info">
+                📞 Info Directa: 3028223498 - 3135485035
+            </a>
+        </div>
+
+        <div class="organizers-footer">
+            <div class="org-box">
+                <span>Organiza</span>
+                <img src="organiza.jpeg" alt="Organiza" class="img-organiza">
+            </div>
+            <div class="org-box">
+                <span>Apoya</span>
+                <img src="apoya.jpeg" alt="Groseros Melgar" class="img-apoya">
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -289,6 +465,43 @@
         }
     }
     precargarDatos();
+
+    function calcularEdad() {
+        const fechaNacInput = document.getElementById('fecha_nacimiento').value;
+        const edadField = document.getElementById('edad_calculada');
+
+        if (!fechaNacInput) {
+            edadField.value = '';
+            return;
+        }
+
+        const hoy = new Date();
+        const cumple = new Date(fechaNacInput);
+        let edad = hoy.getFullYear() - cumple.getFullYear();
+        const m = hoy.getMonth() - cumple.getMonth();
+
+        if (m < 0 || (m === 0 && hoy.getDate() < cumple.getDate())) {
+            edad--;
+        }
+
+        if (edad < 0 || isNaN(edad)) {
+            edadField.value = 'Inválida';
+        } else {
+            edadField.value = `${edad} años`;
+        }
+    }
+
+    function toggleRestriccionAlimentaria() {
+        const tieneRestriccion = document.querySelector('input[name="tiene_restriccion"]:checked').value;
+        const container = document.getElementById('restriccion_detalle_container');
+        container.style.display = (tieneRestriccion === 'Si') ? 'block' : 'none';
+    }
+
+    function toggleDiscapacidad() {
+        const tieneDiscapacidad = document.querySelector('input[name="tiene_discapacidad"]:checked').value;
+        const container = document.getElementById('discapacidad_detalle_container');
+        container.style.display = (tieneDiscapacidad === 'Si') ? 'block' : 'none';
+    }
 
     function toggleOpcionesCarro() {
         const medio = document.querySelector('input[name="transporte_medio"]:checked').value;
@@ -318,9 +531,10 @@
     }
 
     async function guardarRegistroCompleto() {
-        // --- 1. VALIDACIÓN DE CAMPOS OBLIGATORIOS ---
         const tipoDoc = document.getElementById('tipo_doc').value.trim();
         const numDoc = document.getElementById('numero_doc').value.trim();
+        const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+        const edadTexto = document.getElementById('edad_calculada').value;
         const tipoSangre = document.getElementById('tipo_sangre').value.trim();
         const eps = document.getElementById('eps').value.trim();
         const emergenciaNombre = document.getElementById('emergencia_nombre').value.trim();
@@ -329,6 +543,12 @@
         if (!tipoDoc || !numDoc) {
             alert('Por favor completa la sección 1 (Tipo y Número de documento).');
             document.getElementById('numero_doc').focus();
+            return;
+        }
+
+        if (!fechaNacimiento) {
+            alert('Por favor ingresa tu Fecha de Nacimiento.');
+            document.getElementById('fecha_nacimiento').focus();
             return;
         }
 
@@ -350,7 +570,6 @@
             return;
         }
 
-        // Validación de formato de teléfono
         const esEmIntl = document.getElementById('emergencia_intl').checked;
         const prefijoEm = document.getElementById('emergencia_prefijo').value;
         let emergenciaTelFinal = '';
@@ -366,12 +585,29 @@
             emergenciaTelFinal = '+57 ' + emergenciaTelRaw;
         }
 
-        // Restricciones alimentarias
-        const restricciones = Array.from(document.querySelectorAll('input[name="restricciones"]:checked'))
-            .map(cb => cb.value)
-            .join(', ');
+        const tieneRestriccion = document.querySelector('input[name="tiene_restriccion"]:checked').value;
+        const restriccionDetalle = tieneRestriccion === 'Si' ? document.getElementById('restriccion_detalle').value.trim() : 'Ninguna';
 
-        // Carga del comprobante
+        const tieneDiscapacidad = document.querySelector('input[name="tiene_discapacidad"]:checked').value;
+        const discapacidadDetalle = tieneDiscapacidad === 'Si' ? document.getElementById('discapacidad_detalle').value.trim() : 'Ninguna';
+
+        let fotoPersonalUrl = '';
+        const fotoInput = document.getElementById('foto_personal');
+        if (fotoInput.files.length > 0) {
+            const fotoFile = fotoInput.files[0];
+            const fotoExt = fotoFile.name.split('.').pop();
+            const fotoPath = `foto_${userId}_${Date.now()}.${fotoExt}`;
+
+            const { error: fotoError } = await _supabase.storage
+                .from('fotos_asistentes')
+                .upload(fotoPath, fotoFile);
+
+            if (!fotoError) {
+                const { data: publicFoto } = _supabase.storage.from('fotos_asistentes').getPublicUrl(fotoPath);
+                fotoPersonalUrl = publicFoto.publicUrl;
+            }
+        }
+
         let comprobanteUrl = '';
         const fileInput = document.getElementById('pago_imagen');
         if (fileInput.files.length > 0) {
@@ -400,6 +636,10 @@
         const payload = {
             tipo_documento: tipoDoc,
             numero_documento: numDoc,
+            fecha_nacimiento: fechaNacimiento,
+            edad: edadTexto,
+            redes_sociales: document.getElementById('redes_sociales').value.trim(),
+            foto_personal_url: fotoPersonalUrl,
             modalidad_viaje: document.querySelector('input[name="modalidad_viaje"]:checked').value,
             alojamiento_cama: document.querySelector('input[name="alojamiento_cama"]:checked').value,
             transporte_medio: medioTransporte,
@@ -408,14 +648,14 @@
                 ? (parseInt(document.getElementById('carro_puestos_num').value) || 0) 
                 : 0,
             horario_llegada: medioTransporte === 'Carro particular' ? document.getElementById('horario_llegada').value : '',
-            restriccion_alimentaria: restricciones || 'Ninguna',
+            restriccion_alimentaria: restriccionDetalle || 'Ninguna',
+            discapacidad_detalle: discapacidadDetalle || 'Ninguna',
             ambiente_convivencia: document.querySelector('input[name="ambiente_preferencia"]:checked').value,
             tipo_sangre: tipoSangre,
             eps: eps,
             alergias: document.getElementById('alergias').value.trim() || 'Ninguna',
             condiciones_medicas: document.getElementById('condiciones_medicas').value.trim() || 'Ninguna',
             emergencia_nombre: emergenciaNombre,
-            emergencia_parentesco: document.getElementById('emergencia_parentesco').value.trim() || 'No especificado',
             emergencia_telefono: emergenciaTelFinal,
             pago_modalidad: document.querySelector('input[name="pago_modalidad"]:checked').value,
             pago_comprobante_url: comprobanteUrl,
